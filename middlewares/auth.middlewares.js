@@ -20,12 +20,13 @@ const isAuthenticated = expressjwt({
   },
 });
 
-const isUser = (req, res, next) => {
-  req.payload.role === "user"
+const isCapitan = (req, res, next) => {
+  req.payload.role === "capitan"
     ? next()
-    : res.status(401).json({ message: "no e suser" });
+    : res.status(401).json({ message: "no es user" });
 };
 
 module.exports = {
-  isUser,
+  isAuthenticated,
+  isCapitan,
 };
