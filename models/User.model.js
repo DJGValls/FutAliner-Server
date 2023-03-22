@@ -33,6 +33,10 @@ const userSchema = new Schema(
       default:
         "https://res.cloudinary.com/dkz1jslyi/image/upload/v1677055585/Plannerly/blank-profile-picture-973460_1280-1-705x705_zz7gvv.png",
     },
+    player:{
+      type: Schema.Types.ObjectId,
+      ref: "Player"
+    }
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
