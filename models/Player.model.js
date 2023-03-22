@@ -27,6 +27,14 @@ const playerSchema = new Schema(
       required: true,
       trim: true,
     },
+    grupo: {
+      type: Schema.Types.ObjectId,
+      ref: "Grupo",
+    },
+    role: {
+      type: String,
+      enum: [jugador, capitan],
+    },
   },
   {
     timestamps: true,
