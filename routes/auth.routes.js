@@ -1,65 +1,8 @@
-const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
-
-// POST "/api/auth/create-user" => create new user
-router.post("/create-user", async (req, res, next) => {
-  const { firstName, lastName, nickName, email, password1, password2 } =
-    req.body;
-
-  // No fields are empty
-  if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !nickName ||
-    !password1 ||
-    !password2
-  ) {
-    return res
-      .status(400)
-      .json({ errorMessage: "Todos los campos deben estar completos" });
-  }
-
-  // Passwords match
-  if (password1 !== password2) {
-    return res
-      .status(400)
-      .json({ errorMessage: "El password ha de ser igual" });
-  }
-
-  // Password is secure
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$/;
-  if (passwordRegex.test(password1) === false) {
-    return res.status(400).json({
-      errorMessage:
-        "El password debe tener al menos 6 caracteres, incluir una mayuscula y un caracter especial",
-    });
-  }
-  try {
-    // Email does not exist in DB
-    const foundEmail = await User.findOne({ email: email });
-    if (foundEmail) {
-      return res.status(400).json({ errorMessage: "El mail está en uso" });
-    }
-
-    // Encrypt password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password1, salt);
-
-    // Create User
-    const createdUser = await User.create({
-      firstName,
-      lastName,
-      nickName,
-      email,
-      password: hashedPassword,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // POST "/api/auth/login" => validate user credentials
 router.post("/login", async (req, res, next) => {
@@ -109,3 +52,6 @@ router.post("/login", async (req, res, next) => {
 router.get("/verify", isAuthenticated, (req, res, next) => {
     res.status(200).json(req.payload);
   });
+
+
+  module.exports = router;
