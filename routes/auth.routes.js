@@ -35,6 +35,7 @@ router.post("/login", async (req, res, next) => {
       lastName: foundUser.lastName,
       nickName: foundUser.nickName,
       email: foundUser.email,
+      player: foundUser.player
     };
 
     // Generate token
@@ -50,8 +51,7 @@ router.post("/login", async (req, res, next) => {
 
 // GET "/api/auth/verify" => Verify if user is active
 router.get("/verify", isAuthenticated, (req, res, next) => {
-    res.status(200).json(req.payload);
-  });
+  res.status(200).json(req.payload);
+});
 
-
-  module.exports = router;
+module.exports = router;

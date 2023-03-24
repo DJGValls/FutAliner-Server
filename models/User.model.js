@@ -36,6 +36,7 @@ const userSchema = new Schema(
     player: {
       type: Schema.Types.ObjectId,
       ref: "Player",
+      default: null,
     },
   },
   {

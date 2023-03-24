@@ -33,7 +33,8 @@ const playerSchema = new Schema(
     },
     role: {
       type: String,
-      enum: [jugador, capitan],
+      enum: ["jugador", "capitan"],
+      default: "jugador"
     },
   },
   {
