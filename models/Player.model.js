@@ -4,32 +4,36 @@ const playerSchema = new Schema(
   {
     portero: {
       type: Number,
-      required: true,
       trim: true,
+      default: 0,
     },
     defensa: {
       type: Number,
-      required: true,
       trim: true,
+      default: 0,
     },
     tecnica: {
       type: Number,
-      required: true,
       trim: true,
+      default: 0,
     },
     ataque: {
       type: Number,
-      required: true,
       trim: true,
+      default: 0,
     },
     cardio: {
       type: Number,
-      required: true,
       trim: true,
+      default: 0,
     },
     grupo: {
       type: Schema.Types.ObjectId,
       ref: "Grupo",
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     role: {
       type: String,

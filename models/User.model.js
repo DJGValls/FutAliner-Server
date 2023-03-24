@@ -33,9 +33,8 @@ const userSchema = new Schema(
       default:
         "https://res.cloudinary.com/dn3vdudid/image/upload/v1679479488/FutAliner/userIcon_hv30gr.png",
     },
-    player: {
-      type: Schema.Types.ObjectId,
-      ref: "Player",
+    players: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Player" }],
       default: null,
     },
   },
