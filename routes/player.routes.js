@@ -4,8 +4,8 @@ const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 
-// GET "/api/player/create-player"
-router.get("/create-player", isAuthenticated, async (req, res, next) => {
+// POST "/api/player/create-player"
+router.post("/create-player", isAuthenticated, async (req, res, next) => {
   const { portero, defensa, tecnica, ataque, cardio, grupo, role, user } =
     req.body;
   //   console.log(req.payload);
@@ -48,8 +48,13 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
 
   try {
     const foundPlayer = await Player.findById(playerId);
-    // const totalVotes = (totalPoints / 5).toFixed(2)
-    //    console.log(totalVotes);
+    //  no votes for your own player profiles
+    if (foundPlayer.user === req.payload._id) {
+      return res
+      .status(400)
+      .json({ errorMessage: "No puedes votar a perfiles de jugador que te pertenezcan" });
+    }
+    // aplied only first time the player receives a votation
     if (foundPlayer.votes === 0) {
       await Player.findByIdAndUpdate(playerId, {
         portero,
@@ -84,6 +89,19 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
       total: (totalPoints / 5).toFixed(2),
     });
     res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET "/api/player/:playerId"
+router.get("/:playerId", isAuthenticated, async (req, res, next) => {
+  // console.log(req.params.id);
+  const { playerId } = req.params;
+  try {
+    const foundPlayer = await Player.findById(playerId);
+    // console.log(foundPlayer.user);
+    res.status(200).json(foundPlayer);
   } catch (error) {
     next(error);
   }

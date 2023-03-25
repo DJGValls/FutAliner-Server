@@ -59,7 +59,7 @@ router.post("/create-user", async (req, res, next) => {
 router.get("/user", isAuthenticated, async (req, res, next) => {
   try {
     const foundUser = await User.findById(req.payload._id);
-    console.log(req.payload);
+    // console.log(req.payload);
     res.status(200).json(foundUser);
   } catch (error) {
     next(error);
