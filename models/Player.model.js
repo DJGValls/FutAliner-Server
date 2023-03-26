@@ -43,7 +43,7 @@ const playerSchema = new Schema(
     votes: {
       type: Number,
       trim: true,
-      default: 1,
+      default: 0,
     },
     total:{
       type:Number,

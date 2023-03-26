@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
+const Player = require("../models/Player.model")
 
 // POST "/api/user/create-user" => create new user
 router.post("/create-user", async (req, res, next) => {
@@ -167,6 +168,7 @@ router.patch("/:userId/edit-image", isAuthenticated, async (req, res, next) => {
 // DELETE "/user/delete"
 router.delete("/delete", isAuthenticated, async (req, res, next) => {
   try {
+    await Player.deleteMany({user: req.payload._id})
     await User.findByIdAndDelete(req.payload._id);
     res.status(200).json();
   } catch (error) {

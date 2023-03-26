@@ -51,8 +51,11 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
     //  no votes for your own player profiles
     if (foundPlayer.user === req.payload._id) {
       return res
-      .status(400)
-      .json({ errorMessage: "No puedes votar a perfiles de jugador que te pertenezcan" });
+        .status(400)
+        .json({
+          errorMessage:
+            "No puedes votar a perfiles de jugador que te pertenezcan",
+        });
     }
     // aplied only first time the player receives a votation
     if (foundPlayer.votes === 0) {
@@ -106,5 +109,8 @@ router.get("/:playerId", isAuthenticated, async (req, res, next) => {
     next(error);
   }
 });
+
+// DELETE "/api/player/:playerId/delete"
+
 
 module.exports = router;
