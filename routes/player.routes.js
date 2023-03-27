@@ -111,6 +111,22 @@ router.get("/:playerId", isAuthenticated, async (req, res, next) => {
 });
 
 // DELETE "/api/player/:playerId/delete"
+router.delete("/:playerId/delete", isAuthenticated, async (req,res,next)=>{
+  const { playerId } = req.params
+  try {
+    const foundPlayer = await Player.findById(playerId)
+    
+    if (req.payload._id == foundPlayer.user) {
+      
+      await Player.findByIdAndDelete(playerId)
+      return res.status(200).json("personaje borrado")
+    } else{
+      return res.status(400).json({ errorMessage: "No puedes borrar un perfil de jugador que no te pertenezca" });
+    }
 
+  } catch (error) {
+    next(error)
+  }
+})
 
 module.exports = router;
