@@ -16,4 +16,8 @@ router.use("/user", userRoutes);
 const playerRoutes = require("./player.routes");
 router.use("/player", playerRoutes);
 
+// Team routes
+const teamRoutes = require("./team.routes");
+router.use("/team", teamRoutes);
+
 module.exports = router;
