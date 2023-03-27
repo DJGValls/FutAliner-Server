@@ -27,9 +27,9 @@ const playerSchema = new Schema(
       trim: true,
       default: 0,
     },
-    grupo: {
-      type: Schema.Types.ObjectId,
-      ref: "Grupo",
+    teams: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Teams" }],
+      default: null,
     },
     user: {
       type: Schema.Types.ObjectId,
