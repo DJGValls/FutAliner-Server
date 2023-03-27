@@ -27,8 +27,9 @@ const playerSchema = new Schema(
       trim: true,
       default: 0,
     },
-    teams: {
-      type: [{ type: Schema.Types.ObjectId, ref: "Teams" }],
+    team: {
+      type: Schema.Types.ObjectId,
+      ref: "Team",
       default: null,
     },
     user: {
@@ -45,8 +46,8 @@ const playerSchema = new Schema(
       trim: true,
       default: 0,
     },
-    total:{
-      type:Number,
+    total: {
+      type: Number,
       trim: true,
     },
   },

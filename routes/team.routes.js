@@ -1,12 +1,25 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const { isAuthenticated } = require("../middlewares/auth.middlewares");
+const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 const Team = require("../models/Team.model");
 
 // POST "/api/team/create-team"
 router.post("/create-team", isAuthenticated, async (req, res, next) => {
-  const { teamName, password1, password2 } = req.body;
+  const {
+    teamName,
+    password1,
+    password2,
+    portero,
+    defensa,
+    tecnica,
+    ataque,
+    cardio,
+    team,
+    role,
+    user,
+  } = req.body;
 
   // No fields are empty
   if (!teamName || !password1 || !password2) {
@@ -32,11 +45,12 @@ router.post("/create-team", isAuthenticated, async (req, res, next) => {
   }
 
   try {
-
     // team does not exist in DB
     const foundTeam = await Team.findOne({ teamName: teamName });
     if (foundTeam) {
-      return res.status(400).json({ errorMessage: "Ya existe un equipo con ese nombre" });
+      return res
+        .status(400)
+        .json({ errorMessage: "Ya existe un equipo con ese nombre" });
     }
 
     // Encrypt password
@@ -44,14 +58,48 @@ router.post("/create-team", isAuthenticated, async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password1, salt);
 
     // Create team
-    const createdTeam = await Team.create({
-        teamName,
-        password: hashedPassword,
-    })
-    return res.status(201).json(createdTeam);
-    
+    await Team.create({
+      teamName,
+      password: hashedPassword,
+    });
+    // to create player with capitan role
+    const createdPlayer = await Player.create({
+      portero,
+      defensa,
+      tecnica,
+      ataque,
+      cardio,
+      team,
+      role: "capitan",
+      user: req.payload._id,
+    });
+    // to add the id of the new player created to user arrays of players
+    await User.findByIdAndUpdate(
+      req.payload._id,
+      {
+        $push: { players: createdPlayer._id },
+      },
+      { safe: true, upsert: true, new: true }
+    );
   } catch (error) {
-    next(error)
+    next(error);
+  }
+  try {
+    const foundTeam = await Team.findOne({ teamName: teamName });
+    const foundPlayer = await Player.findOne({ team: null });
+    await Player.findByIdAndUpdate(foundPlayer._id, {
+      team: foundTeam._id,
+    });
+    await Team.findByIdAndUpdate(
+      foundTeam._id,
+      {
+        $push: { players: foundPlayer._id },
+      },
+      { safe: true, upsert: true, new: true }
+    );
+    return res.status(201).json();
+  } catch (error) {
+    next(error);
   }
 });
 
