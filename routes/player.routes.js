@@ -108,7 +108,14 @@ router.delete("/:playerId/delete", isAuthenticated, async (req, res, next) => {
 
     if (req.payload._id == foundPlayer.user) {
       await Player.findByIdAndDelete(playerId);
-      return res.status(200).json("personaje borrado");
+      await User.findByIdAndUpdate(
+        req.payload._id,
+        {
+          $pull: { players: { $in: [playerId] } },
+        },
+        { safe: true, upsert: true, new: true }
+      );
+      return res.status(200).json();
     } else {
       return res.status(400).json({
         errorMessage:
