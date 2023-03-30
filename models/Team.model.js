@@ -12,6 +12,11 @@ const teamSchema = new Schema(
       type: String,
       required: [true, "Password is required."],
     },
+    image: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/dn3vdudid/image/upload/v1679479488/FutAliner/userIcon_hv30gr.png",
+    },
     players: {
       type: [{ type: Schema.Types.ObjectId, ref: "Player" }],
     },

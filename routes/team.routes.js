@@ -203,6 +203,24 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// PATCH "/api/team/:teamId/edit-team"
+router.patch("/:teamId/edit-team", isAuthenticated, async(req,res,next)=>{
+  const { teamName, password, image } = req.body
+  const {teamId} = req.params
+  try {
+    const updateTeam = await Team.findByIdAndUpdate(teamId,{
+      teamName,
+      password,
+      image,
+    },
+    { new: true }
+    )
+    res.status(200).json(updateTeam)
+  } catch (error) {
+    next(error)
+  }
+})
+
 // GET "/api/team/:playerId/team"
 router.get("/:playerId/team", isAuthenticated, async (req, res, next) => {
   const { playerId } = req.params;
