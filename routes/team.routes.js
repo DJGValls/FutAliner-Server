@@ -126,7 +126,10 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
   }
 
   try {
-    const foundTeam = await Team.findOne({ teamName: teamName });
+    const foundTeam = await Team.findOne({ teamName: teamName }).populate({
+      path: "players",
+      populate: "user",
+    });
     let playerIsPresent = false;
 
     // team exist in DB
@@ -144,16 +147,18 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
         .status(400)
         .json({ errorMessage: "El password de acceso es incorrecto" });
     }
+
     //  Player is present in the team
-    req.payload.players.forEach((eachUserPlayer) => {
-      if (foundTeam.players.includes(eachUserPlayer)) {
+    foundTeam.players.forEach((eachPlayer) => {
+      // console.log(eachPlayer.user._id);
+      if (eachPlayer.user._id == req.payload._id) {
         return (playerIsPresent = true);
       } else {
         return (playerIsPresent = false);
       }
     });
 
-    console.log(playerIsPresent);
+    // console.log(playerIsPresent);
     if (!playerIsPresent) {
       //   // create player
       const createdPlayer = await Player.create({
@@ -165,7 +170,7 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
         team,
         role,
         user: req.payload._id,
-      });
+      }) 
       // to add the id of the new player created to user arrays of players
       await User.findByIdAndUpdate(
         req.payload._id,
@@ -196,7 +201,9 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
 
       return res.status(201).json();
     } else {
-      return res.status(200).json();
+      return res
+      .status(400)
+      .json({ errorMessage: "Ya estás en este grupo" });
     }
   } catch (error) {
     next(error);
