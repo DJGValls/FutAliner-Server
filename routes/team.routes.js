@@ -204,29 +204,30 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
 });
 
 // PATCH "/api/team/:teamId/edit-team"
-router.patch("/:teamId/edit-team", isAuthenticated, async(req,res,next)=>{
-  const { teamName, password, image } = req.body
-  const {teamId} = req.params
+router.patch("/:teamId/edit-team", isAuthenticated, async (req, res, next) => {
+  const { teamName, password, image } = req.body;
+  const { teamId } = req.params;
   try {
-    const updateTeam = await Team.findByIdAndUpdate(teamId,{
-      teamName,
-      password,
-      image,
-    },
-    { new: true }
-    )
-    res.status(200).json(updateTeam)
+    const updateTeam = await Team.findByIdAndUpdate(
+      teamId,
+      {
+        teamName,
+        password,
+        image,
+      },
+      { new: true }
+    );
+    res.status(200).json(updateTeam);
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 
-// GET "/api/team/:playerId/team"
-router.get("/:playerId/team", isAuthenticated, async (req, res, next) => {
-  const { playerId } = req.params;
+// GET "/api/team/:teamId/team"
+router.get("/:teamId/team", isAuthenticated, async (req, res, next) => {
+  const { teamId } = req.params;
   try {
-    const foundPlayer = await Player.findById(playerId);
-    const foundTeam = await Team.findById(foundPlayer.team);
+    const foundTeam = await Team.findById(teamId);
     res.status(200).json(foundTeam);
   } catch (error) {
     next(error);

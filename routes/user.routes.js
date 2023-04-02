@@ -59,7 +59,10 @@ router.post("/create-user", async (req, res, next) => {
 // GET "/user/user"
 router.get("/user", isAuthenticated, async (req, res, next) => {
   try {
-    const foundUser = await User.findById(req.payload._id);
+    const foundUser = await User.findById(req.payload._id).populate({
+      path: 'players',
+      populate: 'team'
+    });
     // console.log(req.payload);
     res.status(200).json(foundUser);
   } catch (error) {

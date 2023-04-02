@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
+const Team = require("../models/Team.model");
 
 // PATCH "/api/player/:playerId/votes"
 router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
@@ -107,6 +108,13 @@ router.delete("/:playerId/delete", isAuthenticated, async (req, res, next) => {
     const foundPlayer = await Player.findById(playerId);
 
     if (req.payload._id == foundPlayer.user) {
+      await Team.findByIdAndUpdate(
+        foundPlayer.team,
+        {
+          $pull: { players: { $in: [playerId] } },
+        },
+        { safe: true, upsert: true, new: true }
+      );
       await Player.findByIdAndDelete(playerId);
       await User.findByIdAndUpdate(
         req.payload._id,
