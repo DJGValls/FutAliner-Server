@@ -20,4 +20,8 @@ router.use("/player", playerRoutes);
 const teamRoutes = require("./team.routes");
 router.use("/team", teamRoutes);
 
+// Images upload routes
+const imagesRoutes = require("./upload.routes");
+router.use("/upload", imagesRoutes);
+
 module.exports = router;
