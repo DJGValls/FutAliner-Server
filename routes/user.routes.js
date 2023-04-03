@@ -74,6 +74,13 @@ router.get("/user", isAuthenticated, async (req, res, next) => {
 router.patch("/edit-names", isAuthenticated, async (req, res, next) => {
   const { firstName, lastName, nickName } = req.body;
 
+  // No fields are empty
+  if (!firstName || !lastName) {
+    return res
+      .status(400)
+      .json({ errorMessage: "Nombre y apellido no pueden estar vacios" });
+  }
+
   try {
     const updatesNames = await User.findByIdAndUpdate(
       req.payload._id,
@@ -93,6 +100,13 @@ router.patch("/edit-names", isAuthenticated, async (req, res, next) => {
 // PATCH "/user/edit-email"
 router.patch("/edit-email", isAuthenticated, async (req, res, next) => {
   const { email } = req.body;
+
+  // No fields are empty
+  if (!email) {
+    return res
+      .status(400)
+      .json({ errorMessage: "El campo no puede estar vacio" });
+  }
 
   try {
     const foundEmail = await User.findOne({ email: email });
@@ -116,7 +130,16 @@ router.patch("/edit-email", isAuthenticated, async (req, res, next) => {
 
 // PATCH "/user/edit-password"
 router.patch("/edit-password", isAuthenticated, async (req, res, next) => {
-  const { password1, password2 } = req.body;
+  const { oldPassword, password1, password2 } = req.body;
+
+  // Password is correct
+  const isPasswordCorrect = await bcrypt.compare(
+    oldPassword,
+    req.payload.password
+  );
+  if (!isPasswordCorrect) {
+    return res.status(400).json({ errorMessage: "El actual password es incorrecto" });
+  }
 
   // Passwords match
   if (password1 !== password2) {
@@ -150,7 +173,7 @@ router.patch("/edit-password", isAuthenticated, async (req, res, next) => {
 });
 
 // PATCH "/user/edit-image"
-router.patch("/:userId/edit-image", isAuthenticated, async (req, res, next) => {
+router.patch("/edit-image", isAuthenticated, async (req, res, next) => {
   const { image } = req.body;
 
   try {
