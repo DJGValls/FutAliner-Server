@@ -47,9 +47,9 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
       });
     } else {
       // 1 vote per day
-      console.log(lastUpdatedDate);
-      console.log(date);
-      console.log(currentYear, lastUpdatedYear);
+      // console.log(lastUpdatedDate);
+      // console.log(date);
+      // console.log(currentYear, lastUpdatedYear);
       if (
         currentYear === lastUpdatedYear &&
         currentMonth === lastUpdatedMonth &&
@@ -60,11 +60,11 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
           .json({ errorMessage: "Solo puedes votar una vez al dia" });
       } else {
         await Player.findByIdAndUpdate(playerId, {
-          portero: ((foundPlayer.portero + Number(portero)) / 2).toFixed(2),
-          defensa: ((foundPlayer.defensa + Number(defensa)) / 2).toFixed(2),
-          tecnica: ((foundPlayer.tecnica + Number(tecnica)) / 2).toFixed(2),
-          ataque: ((foundPlayer.ataque + Number(ataque)) / 2).toFixed(2),
-          cardio: ((foundPlayer.cardio + Number(cardio)) / 2).toFixed(2),
+          portero: ((foundPlayer.portero + Number(portero)) / 2).toFixed(1),
+          defensa: ((foundPlayer.defensa + Number(defensa)) / 2).toFixed(1),
+          tecnica: ((foundPlayer.tecnica + Number(tecnica)) / 2).toFixed(1),
+          ataque: ((foundPlayer.ataque + Number(ataque)) / 2).toFixed(1),
+          cardio: ((foundPlayer.cardio + Number(cardio)) / 2).toFixed(1),
           votes: foundPlayer.votes + 1,
         });
       }

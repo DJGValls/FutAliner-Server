@@ -17,6 +17,7 @@ router.post("/create-team", isAuthenticated, async (req, res, next) => {
     ataque,
     cardio,
     team,
+    total,
     role,
     user,
   } = req.body;
@@ -72,6 +73,7 @@ router.post("/create-team", isAuthenticated, async (req, res, next) => {
       team,
       role: "capitan",
       user: req.payload._id,
+      total,
     });
     // to add the id of the new player created to user arrays of players
     await User.findByIdAndUpdate(
@@ -116,6 +118,7 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
     team,
     role,
     user,
+    total,
   } = req.body;
 
   // No fields are empty
@@ -170,6 +173,7 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
         team,
         role,
         user: req.payload._id,
+        total,
       }) 
       // to add the id of the new player created to user arrays of players
       await User.findByIdAndUpdate(

@@ -49,6 +49,7 @@ const playerSchema = new Schema(
     total: {
       type: Number,
       trim: true,
+      default: 0,
     },
   },
   {
