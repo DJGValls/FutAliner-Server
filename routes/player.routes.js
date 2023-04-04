@@ -81,7 +81,7 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
       foundPlayer.ataque +
       foundPlayer.cardio;
     await Player.findByIdAndUpdate(playerId, {
-      total: (totalPoints / 5).toFixed(2),
+      total: (totalPoints / 5).toFixed(1),
     });
     res.status(200).json();
   } catch (error) {
@@ -93,7 +93,13 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
 router.get("/:playerId", isAuthenticated, async (req, res, next) => {
   const { playerId } = req.params;
   try {
-    const foundPlayer = await Player.findById(playerId).populate('team');
+    const foundPlayer = await Player.findById(playerId).populate({
+      path: "team",
+      populate: {
+        path: "players",
+        populate: "user",
+      },
+    });
     // console.log(foundPlayer.user);
     res.status(200).json(foundPlayer);
   } catch (error) {

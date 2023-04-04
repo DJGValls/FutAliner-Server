@@ -234,7 +234,7 @@ router.patch("/:teamId/edit-team", isAuthenticated, async (req, res, next) => {
 router.get("/:teamId/team", isAuthenticated, async (req, res, next) => {
   const { teamId } = req.params;
   try {
-    const foundTeam = await Team.findById(teamId);
+    const foundTeam = await Team.findById(teamId).populate('players');
     res.status(200).json(foundTeam);
   } catch (error) {
     next(error);
