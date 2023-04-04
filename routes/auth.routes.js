@@ -35,7 +35,8 @@ router.post("/login", async (req, res, next) => {
       lastName: foundUser.lastName,
       nickName: foundUser.nickName,
       email: foundUser.email,
-      players: foundUser.players
+      players: foundUser.players,
+      password: foundUser.password,
     };
 
     // Generate token

@@ -2,7 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
-const Player = require("../models/Player.model")
+const Player = require("../models/Player.model");
 
 // POST "/api/user/create-user" => create new user
 router.post("/create-user", async (req, res, next) => {
@@ -60,8 +60,8 @@ router.post("/create-user", async (req, res, next) => {
 router.get("/user", isAuthenticated, async (req, res, next) => {
   try {
     const foundUser = await User.findById(req.payload._id).populate({
-      path: 'players',
-      populate: 'team'
+      path: "players",
+      populate: "team",
     });
     // console.log(req.payload);
     res.status(200).json(foundUser);
@@ -132,13 +132,11 @@ router.patch("/edit-email", isAuthenticated, async (req, res, next) => {
 router.patch("/edit-password", isAuthenticated, async (req, res, next) => {
   const { oldPassword, password1, password2 } = req.body;
 
-  // Password is correct
-  const isPasswordCorrect = await bcrypt.compare(
-    oldPassword,
-    req.payload.password
-  );
-  if (!isPasswordCorrect) {
-    return res.status(400).json({ errorMessage: "El actual password es incorrecto" });
+  // No fields are empty
+  if (!oldPassword || !password1 || !password2) {
+    return res
+      .status(400)
+      .json({ errorMessage: "Todos los campos deben estar completos" });
   }
 
   // Passwords match
@@ -158,6 +156,19 @@ router.patch("/edit-password", isAuthenticated, async (req, res, next) => {
   }
 
   try {
+    
+    // Password is correct
+    const foundUser = await User.findById(req.payload._id);
+    const isPasswordCorrect = await bcrypt.compare(
+      oldPassword,
+      foundUser.password
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(400)
+        .json({ errorMessage: "El actual password es incorrecto" });
+    }
+
     // Encrypt password
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password1, salt);
@@ -194,7 +205,7 @@ router.patch("/edit-image", isAuthenticated, async (req, res, next) => {
 // DELETE "/user/delete"
 router.delete("/delete", isAuthenticated, async (req, res, next) => {
   try {
-    await Player.deleteMany({user: req.payload._id})
+    await Player.deleteMany({ user: req.payload._id });
     await User.findByIdAndDelete(req.payload._id);
     res.status(200).json();
   } catch (error) {
