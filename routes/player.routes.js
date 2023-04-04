@@ -21,6 +21,20 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
       .json({ errorMessage: "Todos los campos deben estar completos" });
   }
 
+  // fields are > 10
+  if (portero > 10 || defensa > 10 || tecnica > 10 || ataque > 10 || cardio > 10) {
+    return res
+      .status(400)
+      .json({ errorMessage: "Ningún campo ha de superar 10 puntos" });
+  }
+
+  // fields are > 10
+  if (portero < 0 || defensa < 0 || tecnica < 0 || ataque < 0 || cardio < 0) {
+    return res
+      .status(400)
+      .json({ errorMessage: "Ningún campo puede ser negativo" });
+  }
+
   try {
     const foundPlayer = await Player.findById(playerId);
     const lastUpdatedDate = foundPlayer.updatedAt;
