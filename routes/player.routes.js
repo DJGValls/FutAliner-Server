@@ -93,7 +93,7 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
 router.get("/:playerId", isAuthenticated, async (req, res, next) => {
   const { playerId } = req.params;
   try {
-    const foundPlayer = await Player.findById(playerId);
+    const foundPlayer = await Player.findById(playerId).populate('team');
     // console.log(foundPlayer.user);
     res.status(200).json(foundPlayer);
   } catch (error) {
