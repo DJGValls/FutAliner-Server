@@ -43,7 +43,7 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
     const lastUpdatedDay = lastUpdatedDate.getDate();
 
     //  no votes for your own player profiles
-    if (foundPlayer.user === req.payload._id) {
+    if (foundPlayer.user == req.payload._id) {
       return res.status(400).json({
         errorMessage:
           "No puedes votar a perfiles de jugador que te pertenezcan",
