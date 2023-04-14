@@ -4,6 +4,7 @@ const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 const Team = require("../models/Team.model");
+const generatePlayerGroups = require("../source/teams/PlayerGroups");
 
 // POST "/api/team/create-team"
 router.post("/create-team", isAuthenticated, async (req, res, next) => {
@@ -174,7 +175,7 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
         role,
         user: req.payload._id,
         total,
-      }) 
+      });
       // to add the id of the new player created to user arrays of players
       await User.findByIdAndUpdate(
         req.payload._id,
@@ -205,9 +206,7 @@ router.post("/join-team", isAuthenticated, async (req, res, next) => {
 
       return res.status(201).json();
     } else {
-      return res
-      .status(400)
-      .json({ errorMessage: "Ya estás en este grupo" });
+      return res.status(400).json({ errorMessage: "Ya estás en este grupo" });
     }
   } catch (error) {
     next(error);
@@ -238,7 +237,7 @@ router.patch("/:teamId/edit-team", isAuthenticated, async (req, res, next) => {
 router.get("/:teamId/team", isAuthenticated, async (req, res, next) => {
   const { teamId } = req.params;
   try {
-    const foundTeam = await Team.findById(teamId).populate('players');
+    const foundTeam = await Team.findById(teamId).populate("players");
     res.status(200).json(foundTeam);
   } catch (error) {
     next(error);
@@ -271,6 +270,107 @@ router.delete("/:playerId/delete", isAuthenticated, async (req, res, next) => {
 
       res.status(200).json();
     }
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST "api/team/selected-players"
+router.post("/selected-players", isAuthenticated, async (req, res, next) => {
+  console.log(req.body.selectedPlayersList);
+
+  try {
+    /*const allPlayers = await Promise.all(req.body.selectedPlayersList.map(async (eachPlayer) => 
+      await Player.findById(eachPlayer).exec()
+    ));*/
+
+    const allPlayers = [
+      {
+        _id: "1",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "2",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "3",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "4",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "5",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "6",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "7",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "8",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "9",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      },
+      {
+        _id: "10",
+        portero: 2,
+        defensa: 3,
+        ataque: 4,
+        tecnica: 7,
+        cardio: 1
+      }
+    ];
+
+
+    const groups = generatePlayerGroups(allPlayers);
+
+    return res.status(201).json(groups);
   } catch (error) {
     next(error);
   }
