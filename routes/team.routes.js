@@ -287,84 +287,85 @@ router.post("/selected-players", isAuthenticated, async (req, res, next) => {
     const allPlayers = [
       {
         _id: "1",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        portero: 10,
+        defensa: 5,
+        ataque: 5,
+        tecnica: 5,
+        cardio: 5
       },
       {
         _id: "2",
         portero: 2,
-        defensa: 3,
+        defensa: 10,
         ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        tecnica: 5,
+        cardio: 10
       },
       {
         _id: "3",
-        portero: 2,
+        portero: 5,
         defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        ataque: 9,
+        tecnica: 6,
+        cardio: 7
       },
       {
         _id: "4",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        portero: 9,
+        defensa: 0,
+        ataque: 0,
+        tecnica: 8,
+        cardio: 2
       },
       {
         _id: "5",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        portero: 5,
+        defensa: 5,
+        ataque: 7,
+        tecnica: 8,
+        cardio: 5
       },
       {
         _id: "6",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        portero: 4,
+        defensa: 9,
+        ataque: 5,
+        tecnica: 8,
+        cardio: 4
       },
       {
         _id: "7",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
-        tecnica: 7,
-        cardio: 1
+        portero: 4,
+        defensa: 7,
+        ataque: 3,
+        tecnica: 9,
+        cardio: 10
       },
       {
         _id: "8",
         portero: 2,
-        defensa: 3,
-        ataque: 4,
+        defensa: 7,
+        ataque: 6,
         tecnica: 7,
-        cardio: 1
+        cardio: 5
       },
       {
         _id: "9",
-        portero: 2,
-        defensa: 3,
-        ataque: 4,
+        portero: 0,
+        defensa: 4,
+        ataque: 10,
         tecnica: 7,
-        cardio: 1
+        cardio: 10
       },
       {
         _id: "10",
-        portero: 2,
+        portero: 3,
         defensa: 3,
-        ataque: 4,
-        tecnica: 7,
+        ataque: 5,
+        tecnica: 6,
         cardio: 1
-      }
+      },
+     
     ];
 
 
