@@ -14,7 +14,7 @@ function generatePlayerGroups(allPlayers) {
    */
   playersScoreLevel(allPlayers);
   calculatePosition(allPlayers);
-  generateAllTwoGroupCombinations(allPlayers);
+  generateTwoGroupCombinations(allPlayers);
   // console.log(combinations);
   // const orderedByLevelDifference = orderByLevelDifference(combinations);
   // console.log(orderedByLevelDifference);
@@ -28,13 +28,13 @@ function playersScoreLevel(allPlayers) {
       goalkeeperLevel: eachPlayer.portero,
       defenseLevel: (eachPlayer.defensa + eachPlayer.cardio) / 2,
       midfieldLevel: (eachPlayer.tecnica + eachPlayer.cardio) / 2,
+      atackLevel: (eachPlayer.ataque + eachPlayer.cardio) / 2,
       totalplayerLevel:
         (eachPlayer.defensa +
           eachPlayer.ataque +
           eachPlayer.tecnica +
           eachPlayer.ataque) /
         4,
-      atackLevel: (eachPlayer.ataque + eachPlayer.cardio) / 2,
     });
   });
 
@@ -47,67 +47,91 @@ function calculatePosition(allPlayers) {
     if (
       eachPlayer.goalkeeperLevel > eachPlayer.defenseLevel &&
       eachPlayer.goalkeeperLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.goalkeeperLevel > eachPlayer.atackLevel &&
-      eachPlayer.goalkeeperLevel > eachPlayer.totalplayerLevel
+      eachPlayer.goalkeeperLevel > eachPlayer.atackLevel
     ) {
       const positionG = {
         position: "goalkeeper",
       };
+      eachPlayer.totalplayerLevel = eachPlayer.goalkeeperLevel;
       return Object.assign(eachPlayer, positionG);
     }
 
     if (
       eachPlayer.defenseLevel > eachPlayer.goalkeeperLevel &&
       eachPlayer.defenseLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.defenseLevel > eachPlayer.atackLevel &&
-      eachPlayer.defenseLevel > eachPlayer.totalplayerLevel
+      eachPlayer.defenseLevel >= eachPlayer.atackLevel
     ) {
       const positionD = {
         position: "defense",
       };
+      eachPlayer.totalplayerLevel = eachPlayer.defenseLevel;
       return Object.assign(eachPlayer, positionD);
     }
 
     if (
-      eachPlayer.midfieldLevel > eachPlayer.goalkeeperLevel &&
-      eachPlayer.midfieldLevel > eachPlayer.defenseLevel &&
-      eachPlayer.midfieldLevel > eachPlayer.atackLevel &&
-      eachPlayer.midfieldLevel > eachPlayer.totalplayerLevel
+      eachPlayer.midfieldLevel >= eachPlayer.goalkeeperLevel &&
+      eachPlayer.midfieldLevel >= eachPlayer.defenseLevel &&
+      eachPlayer.midfieldLevel >= eachPlayer.atackLevel
     ) {
       const positionM = {
         position: "midfield",
       };
+      eachPlayer.totalplayerLevel = eachPlayer.midfieldLevel;
       return Object.assign(eachPlayer, positionM);
     }
 
     if (
       eachPlayer.atackLevel > eachPlayer.goalkeeperLevel &&
       eachPlayer.atackLevel > eachPlayer.defenseLevel &&
-      eachPlayer.atackLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.atackLevel > eachPlayer.totalplayerLevel
+      eachPlayer.atackLevel > eachPlayer.midfieldLevel
     ) {
       const positionA = {
         position: "forward",
       };
+      eachPlayer.totalplayerLevel = eachPlayer.atackLevel;
       return Object.assign(eachPlayer, positionA);
     }
+  });
 
-    if (
-      eachPlayer.totalplayerLevel > eachPlayer.goalkeeperLevel &&
-      eachPlayer.totalplayerLevel > eachPlayer.defenseLevel &&
-      eachPlayer.totalplayerLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.totalplayerLevel > eachPlayer.atackLevel
-    ) {
-      const positionT = {
-        position: "totalPlayer",
-      };
-      return Object.assign(eachPlayer, positionT);
+  let listOfGoalKeepers = [];
+  allPlayers.forEach((eachPlayer) => {
+    if (eachPlayer.position === "goalkeeper") {
+      listOfGoalKeepers.push(eachPlayer);
     }
   });
-  return allPlayers;
+
+  if (listOfGoalKeepers.length >= 3) {
+    listOfGoalKeepers = listOfGoalKeepers.sort((a, b) => {
+      return (
+        Number.parseInt(a.totalplayerLevel) -
+        Number.parseInt(b.totalplayerLevel)
+      );
+    });
+
+    const response = allPlayers.findIndex(
+      (player) => player._id === listOfGoalKeepers[0]._id
+    );
+    allplayers = allPlayers.splice(response, 1, {
+      id: allPlayers[response]._id,
+      goalkeeperLevel: allPlayers[response].goalkeeperLevel,
+      defenseLevel: allPlayers[response].defenseLevel,
+      midfieldLevel: allPlayers[response].midfieldLevel,
+      atackLevel: allPlayers[response].atackLevel,
+      totalplayerLevel:
+        (allPlayers[response].defenseLevel +
+          allPlayers[response].midfieldLevel +
+          allPlayers[response].atackLevel) /
+        3,
+      position: "player",
+    });
+    return allPlayers;
+  } else {
+    return allPlayers;
+  }
 }
 
-function generateAllTwoGroupCombinations(allPlayers) {
+function generateTwoGroupCombinations(allPlayers) {
+  console.log(allPlayers);
   const response = combinationsGenerator(
     allPlayers,
     Math.floor(allPlayers.length / 2),
@@ -118,9 +142,9 @@ function generateAllTwoGroupCombinations(allPlayers) {
   const combinationA = response.slice(0, divisionGroup);
   const combinationB = response.slice(divisionGroup); //Si no se indica el indice se usa la longitud como referencia para la división
 
-  console.log(combinationA);
-
-  console.log(combinationB);
+  combinationA.forEach((eachCombinationA) => {
+    // console.log(eachCombinationA);
+  });
 
   // const filterTwoGoalkepersInOneCombination = (obj)=>{
   //   if ("goalkeeper") {
