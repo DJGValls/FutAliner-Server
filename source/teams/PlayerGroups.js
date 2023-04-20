@@ -14,6 +14,7 @@ function generatePlayerGroups(allPlayers) {
    */
   playersScoreLevel(allPlayers);
   calculatePosition(allPlayers);
+  filterGoalKeepers(allPlayers);
   generateTwoGroupCombinations(allPlayers);
   // console.log(combinations);
   // const orderedByLevelDifference = orderByLevelDifference(combinations);
@@ -92,7 +93,9 @@ function calculatePosition(allPlayers) {
       return Object.assign(eachPlayer, positionA);
     }
   });
+}
 
+function filterGoalKeepers(allPlayers) {
   let listOfGoalKeepers = [];
   allPlayers.forEach((eachPlayer) => {
     if (eachPlayer.position === "goalkeeper") {
@@ -124,6 +127,7 @@ function calculatePosition(allPlayers) {
         3,
       position: "player",
     });
+    filterGoalKeepers(allPlayers);
     return allPlayers;
   } else {
     return allPlayers;
@@ -131,111 +135,79 @@ function calculatePosition(allPlayers) {
 }
 
 function generateTwoGroupCombinations(allPlayers) {
-  console.log(allPlayers);
-  const response = combinationsGenerator(
-    allPlayers,
-    Math.floor(allPlayers.length / 2),
-    Math.round(allPlayers.length / 2)
-  );
-
-  const divisionGroup = Math.floor(response.length / 2); //Nos devuelve el número medio que divide en 2 las combinaciones
-  const combinationA = response.slice(0, divisionGroup);
-  const combinationB = response.slice(divisionGroup); //Si no se indica el indice se usa la longitud como referencia para la división
-
-  combinationA.forEach((eachCombinationA) => {
-    // console.log(eachCombinationA);
+  const teamA = [];
+  const teamB = [];
+  const goalkeeperList = [];
+  // extrae los porteros de allplayers a goalkeeperlist
+  allPlayers.forEach((eachPlayer) => {
+    if (eachPlayer.position === "goalkeeper") {
+      const playerIndex = allPlayers.indexOf(eachPlayer);
+      goalkeeperList.push(eachPlayer);
+      allPlayers.splice(playerIndex, 1);
+    }
   });
 
-  // const filterTwoGoalkepersInOneCombination = (obj)=>{
-  //   if ("goalkeeper") {
+  // ordenamos allplayers como ultimo elemento el mejor atacante
+  allPlayers.sort(function (a, b) {
+    if (a.atackLevel > b.atackLevel) {
+      return 1;
+    }
+    if (a.atackLevel < b.atackLevel) {
+      return -1;
+    }
+    // a must be equal to b
+    return 0;
+  });
+  // extrae el mejor atacante de allplayers a teamB
+  const poppedAttacker = allPlayers.pop()
+  teamB.push(poppedAttacker)
+  const poppedAttacker2 = allPlayers.pop()
+  teamA.push(poppedAttacker2)
 
+  // ordenamos goalkeeperlist como ultimo elemento el mejor portero
+  goalkeeperList.sort(function (a, b) {
+    if (a.goalkeeperLevel > b.goalkeeperLevel) {
+      return 1;
+    }
+    if (a.goalkeeperLevel < b.goalkeeperLevel) {
+      return -1;
+    }
+    // a must be equal to b
+    return 0;
+  });
+  
+  const poppedGoalkeeper = goalkeeperList.pop()
+  teamA.push(poppedGoalkeeper)
+  teamB.push(goalkeeperList[0])
+  
+  console.log("Esto es el team A " + teamA);
+  console.log("Esto es el team B " + teamB);
+
+  // console.log(allPlayers);
+
+  // Test de goalkeepers max
+  // let listOfGoalKeepers = [];
+  // allPlayers.forEach((eachPlayer) => {
+  //   if (eachPlayer.position === "goalkeeper") {
+  //     listOfGoalKeepers.push(eachPlayer);
   //   }
-  // }
+  // });
+  // console.log(listOfGoalKeepers);
 
-  // const filteredResponse = response.reduce((lastValue, actualValue, index)=>{
-  //   if (lastValue[actualValue.position = ++]) {
-  //     console.log(lastValue[actualValue.position]);
-  //   }
-  // })
+  // const response = combinationsGenerator(
+  //   allPlayers,
+  //   Math.floor(allPlayers.length / 2),
+  //   Math.round(allPlayers.length / 2)
+  //   );
 
-  // return
+  //   const divisionGroup = Math.floor(response.length / 2); //Nos devuelve el número medio que divide en 2 las combinaciones
+  //   const combinationA = response.slice(0, divisionGroup);
+  //   const combinationB = response.slice(divisionGroup); //Si no se indica el indice se usa la longitud como referencia para la división
+  //   // console.log(combinationA[0]);
+
+  // combinationA.forEach((eachCombinationA) => {
+  //   // console.log(eachCombinationA);
+  // });
 }
-
-// function orderByLevelDifference(combinations) {
-//   combinations.sort((combinationA, combinationB) => {
-//     const levelDifferenceA = levelDifference(combinationA);
-//     const levelDifferenceB = levelDifference(combinationB);
-
-//     if (levelDifferenceA === levelDifferenceB) return 0;
-//     return levelDifferenceA < levelDifferenceB ? -1 : 1;
-//   });
-// }
-
-// function levelDifference(combination) {
-//   return Math.abs(level(combination[0]) - level(combination[1]));
-// }
-
-// function level(playerGroup) {
-//   /*
-//         Para calcular el nivel de un equipo,
-//         calculamos el nivel en cada posición (portero, defensa, ataque)
-//         y lo sumamos.
-//         El nivel en cada posición será la suma del "poder" que aporta cada jugador en esa
-//         posición.
-//     */
-//   const goalKeeperLevel = positionLevel("goalkeeper", playerGroup);
-//   const defenseLevel = positionLevel("defense", playerGroup);
-//   const midFieldLevel = positionLevel("midfield", playerGroup);
-//   const attackLevel = positionLevel("attack", playerGroup);
-//   return goalKeeperLevel + defenseLevel + midFieldLevel + attackLevel;
-// }
-
-// function positionLevel(position, playerGroup) {
-//   /*
-//         ejemplo playerGroup:
-//         {
-//             "goalKeeper": [player],
-//             "defense": [player],
-//             "midfield": [player, player]
-//             "attack": [player]
-//         }
-//     */
-//   return playerGroup[position]
-//     .map((player) => playerLevel(player, position))
-//     .reduce((levelPlayerA, levelPlayerB) => {
-//       return levelPlayerA + levelPlayerB;
-//     });
-// }
-
-// function playerLevel(player, position) {
-//   switch (position) {
-//     case "goalKeeper":
-//       return calculateGoalKeeperLevel(player);
-//     case "defense":
-//       return calculateDefenseLevel(player);
-//     case "midfield":
-//       return calculateMidFieldLevel(player);
-//     default:
-//     case "attack":
-//       return calculateAttackLevel(player);
-//   }
-// }
-
-// function calculateGoalKeeperLevel(player) {
-//   console.log(player);
-//   return player.portero;
-// }
-
-// function calculateDefenseLevel(player) {
-//   return player.defensa + player.cardio;
-// }
-
-// function calculateMidFieldLevel(player) {
-//   return player.tecnica + player.defensa + player.ataque + player.cardio;
-// }
-
-// function calculateAttackLevel(player) {
-//   return player.ataque + player.tecnica;
-// }
 
 module.exports = generatePlayerGroups;

@@ -373,6 +373,14 @@ router.post("/selected-players", isAuthenticated, async (req, res, next) => {
         tecnica: 6,
         cardio: 1
       },
+      {
+        _id: "12",
+        portero: 6,
+        defensa: 2,
+        ataque: 2,
+        tecnica: 2,
+        cardio: 1
+      },
      
     ];
 
