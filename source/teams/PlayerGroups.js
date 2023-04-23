@@ -15,7 +15,7 @@ function generatePlayerGroups(allPlayers) {
   playersScoreLevel(allPlayers);
   calculatePosition(allPlayers);
   filterGoalKeepers(allPlayers);
-  generateTwoGroupCombinations(allPlayers);
+  generateTeams(allPlayers);
   // console.log(combinations);
   // const orderedByLevelDifference = orderByLevelDifference(combinations);
   // console.log(orderedByLevelDifference);
@@ -115,7 +115,7 @@ function filterGoalKeepers(allPlayers) {
       (player) => player._id === listOfGoalKeepers[0]._id
     );
     allplayers = allPlayers.splice(response, 1, {
-      id: allPlayers[response]._id,
+      _id: allPlayers[response]._id,
       goalkeeperLevel: allPlayers[response].goalkeeperLevel,
       defenseLevel: allPlayers[response].defenseLevel,
       midfieldLevel: allPlayers[response].midfieldLevel,
@@ -134,10 +134,13 @@ function filterGoalKeepers(allPlayers) {
   }
 }
 
-function generateTwoGroupCombinations(allPlayers) {
+function generateTeams(allPlayers) {
   const teamA = [];
   const teamB = [];
   const goalkeeperList = [];
+  let teamAScore = 0;
+  let teamBScore = 0;
+
   // extrae los porteros de allplayers a goalkeeperlist
   allPlayers.forEach((eachPlayer) => {
     if (eachPlayer.position === "goalkeeper") {
@@ -146,6 +149,22 @@ function generateTwoGroupCombinations(allPlayers) {
       allPlayers.splice(playerIndex, 1);
     }
   });
+
+  // ordenamos goalkeeperlist como ultimo elemento el mejor portero
+  goalkeeperList.sort(function (a, b) {
+    if (a.goalkeeperLevel > b.goalkeeperLevel) {
+      return 1;
+    }
+    if (a.goalkeeperLevel < b.goalkeeperLevel) {
+      return -1;
+    }
+    // a must be equal to b
+    return 0;
+  });
+
+  const poppedGoalkeeper = goalkeeperList.pop();
+  teamA.push(poppedGoalkeeper);
+  teamB.push(goalkeeperList[0]);
 
   // ordenamos allplayers como ultimo elemento el mejor atacante
   allPlayers.sort(function (a, b) {
@@ -159,55 +178,69 @@ function generateTwoGroupCombinations(allPlayers) {
     return 0;
   });
   // extrae el mejor atacante de allplayers a teamB
-  const poppedAttacker = allPlayers.pop()
-  teamB.push(poppedAttacker)
-  const poppedAttacker2 = allPlayers.pop()
-  teamA.push(poppedAttacker2)
+  const poppedAttacker = allPlayers.pop();
+  teamB.push(poppedAttacker);
+  const poppedAttacker2 = allPlayers.pop();
+  teamA.push(poppedAttacker2);
 
-  // ordenamos goalkeeperlist como ultimo elemento el mejor portero
-  goalkeeperList.sort(function (a, b) {
-    if (a.goalkeeperLevel > b.goalkeeperLevel) {
+  // ordenamos allplayers como último elemento el mejor jugador totalplayerlevel
+  allPlayers.sort(function (a, b) {
+    if (a.totalplayerLevel > b.totalplayerLevel) {
       return 1;
     }
-    if (a.goalkeeperLevel < b.goalkeeperLevel) {
+    if (a.totalplayerLevel < b.totalplayerLevel) {
       return -1;
     }
     // a must be equal to b
     return 0;
   });
-  
-  const poppedGoalkeeper = goalkeeperList.pop()
-  teamA.push(poppedGoalkeeper)
-  teamB.push(goalkeeperList[0])
-  
-  console.log("Esto es el team A " + teamA);
-  console.log("Esto es el team B " + teamB);
+  dividePlayers();
+  // extraemos el mejor totlaplayerlevel al peor de los dos equipos
+  function dividePlayers() {
+    // Guarda la puntuación total del equipo A
+    teamA.forEach((eachPlayer) => {
+      teamAScore = teamAScore + eachPlayer.totalplayerLevel;
+    });
 
-  // console.log(allPlayers);
+    // Guarda la puntuación total del equipo B
+    teamB.forEach((eachPlayer) => {
+      teamBScore = teamBScore + eachPlayer.totalplayerLevel;
+    });
 
-  // Test de goalkeepers max
-  // let listOfGoalKeepers = [];
-  // allPlayers.forEach((eachPlayer) => {
-  //   if (eachPlayer.position === "goalkeeper") {
-  //     listOfGoalKeepers.push(eachPlayer);
-  //   }
-  // });
-  // console.log(listOfGoalKeepers);
-
-  // const response = combinationsGenerator(
-  //   allPlayers,
-  //   Math.floor(allPlayers.length / 2),
-  //   Math.round(allPlayers.length / 2)
-  //   );
-
-  //   const divisionGroup = Math.floor(response.length / 2); //Nos devuelve el número medio que divide en 2 las combinaciones
-  //   const combinationA = response.slice(0, divisionGroup);
-  //   const combinationB = response.slice(divisionGroup); //Si no se indica el indice se usa la longitud como referencia para la división
-  //   // console.log(combinationA[0]);
-
-  // combinationA.forEach((eachCombinationA) => {
-  //   // console.log(eachCombinationA);
-  // });
+    if (teamAScore > teamBScore) {
+      if (allPlayers.length > 0) {
+        const poppedTotalplayerLevel = allPlayers.pop();
+        teamB.push(poppedTotalplayerLevel);
+      } else {
+        return console.log(teamA, teamB, teamAScore, teamBScore);
+      }
+      if (allPlayers.length > 0) {
+        const poppedTotalplayerLevel2 = allPlayers.pop();
+        teamA.push(poppedTotalplayerLevel2);
+      } else {
+        return console.log(teamA, teamB, teamAScore, teamBScore);
+      }
+    } else {
+      if (allPlayers.length > 0) {
+        const poppedTotalplayerLevel2 = allPlayers.pop();
+        teamA.push(poppedTotalplayerLevel2);
+      } else {
+        return console.log(teamA, teamB, teamAScore, teamBScore);
+      }
+      if (allPlayers.length > 0) {
+        const poppedTotalplayerLevel = allPlayers.pop();
+        teamB.push(poppedTotalplayerLevel);
+      } else {
+        return console.log(teamA, teamB, teamAScore, teamBScore);
+      }
+    }
+    dividePlayers();
+  }
+  console.log(teamAScore);
+  console.log(teamBScore);
+  console.log(teamA.length);
+  console.log(teamB.length);
+  console.log(allPlayers.length);
 }
 
 module.exports = generatePlayerGroups;
