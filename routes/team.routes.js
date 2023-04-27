@@ -277,113 +277,12 @@ router.delete("/:playerId/delete", isAuthenticated, async (req, res, next) => {
 
 // POST "api/team/selected-players"
 router.post("/selected-players", isAuthenticated, async (req, res, next) => {
-  console.log(req.body.selectedPlayersList);
+  // console.log(req.body.selectedPlayersList);
 
   try {
-    /*const allPlayers = await Promise.all(req.body.selectedPlayersList.map(async (eachPlayer) => 
+    const allPlayers = await Promise.all(req.body.selectedPlayersList.map(async (eachPlayer) => 
       await Player.findById(eachPlayer).exec()
-    ));*/
-
-    const allPlayers = [
-      {
-        _id: "1",
-        portero: 10,
-        defensa: 5,
-        ataque: 5,
-        tecnica: 5,
-        cardio: 5
-      },
-      {
-        _id: "2",
-        portero: 2,
-        defensa: 10,
-        ataque: 4,
-        tecnica: 5,
-        cardio: 10
-      },
-      {
-        _id: "3",
-        portero: 5,
-        defensa: 3,
-        ataque: 9,
-        tecnica: 6,
-        cardio: 7
-      },
-      {
-        _id: "4",
-        portero: 9,
-        defensa: 0,
-        ataque: 0,
-        tecnica: 8,
-        cardio: 2
-      },
-      {
-        _id: "5",
-        portero: 5,
-        defensa: 5,
-        ataque: 7,
-        tecnica: 8,
-        cardio: 5
-      },
-      {
-        _id: "6",
-        portero: 4,
-        defensa: 9,
-        ataque: 5,
-        tecnica: 8,
-        cardio: 4
-      },
-      {
-        _id: "7",
-        portero: 4,
-        defensa: 7,
-        ataque: 3,
-        tecnica: 9,
-        cardio: 10
-      },
-      {
-        _id: "8",
-        portero: 2,
-        defensa: 7,
-        ataque: 6,
-        tecnica: 7,
-        cardio: 5
-      },
-      {
-        _id: "9",
-        portero: 0,
-        defensa: 4,
-        ataque: 10,
-        tecnica: 7,
-        cardio: 10
-      },
-      {
-        _id: "10",
-        portero: 3,
-        defensa: 3,
-        ataque: 5,
-        tecnica: 6,
-        cardio: 1
-      },
-      {
-        _id: "11",
-        portero: 7,
-        defensa: 3,
-        ataque: 5,
-        tecnica: 6,
-        cardio: 1
-      },
-      {
-        _id: "12",
-        portero: 6,
-        defensa: 2,
-        ataque: 2,
-        tecnica: 2,
-        cardio: 1
-      },
-     
-    ];
-
+    ))
 
     const groups = generatePlayerGroups(allPlayers);
 
