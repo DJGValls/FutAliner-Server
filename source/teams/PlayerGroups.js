@@ -5,6 +5,10 @@ const { all } = require("../../routes/user.routes");
 
 const goalkeeperList = [];
 let goalkeeperCounter = 0;
+const teamA = [];
+const teamB = [];
+let teamAScore = 0;
+let teamBScore = 0;
 
 function generatePlayerGroups(allPlayers) {
   playersScoreLevel(allPlayers);
@@ -130,11 +134,6 @@ function filterGoalKeepers(allPlayers) {
 }
 
 function generateTeams(allPlayers) {
-  const teamA = [];
-  const teamB = [];
-  let teamAScore = 0;
-  let teamBScore = 0;
-
   // ordenamos goalkeeperlist como ultimo elemento el mejor portero y los distribuimos a los equipos
   goalkeeperList.sort(function (a, b) {
     if (a.totalplayerLevel > b.totalplayerLevel) {
@@ -214,23 +213,23 @@ function generateTeams(allPlayers) {
       if (allPlayers.length > 0) {
         teamB.push(allPlayers.pop());
       } else {
-        return console.log(teamA, teamB);
+        return teamA, teamB;
       }
       if (allPlayers.length > 0) {
         teamA.push(allPlayers.pop());
       } else {
-        return console.log(teamA, teamB);
+        return teamA, teamB;
       }
     } else {
       if (allPlayers.length > 0) {
         teamA.push(allPlayers.pop());
       } else {
-        return console.log(teamA, teamB);
+        return teamA, teamB;
       }
       if (allPlayers.length > 0) {
         teamB.push(allPlayers.pop());
       } else {
-        return console.log(teamA, teamB);
+        return teamA, teamB;
       }
     }
     dividePlayers();
@@ -242,4 +241,4 @@ function generateTeams(allPlayers) {
   console.log(allPlayers.length);
 }
 
-module.exports = generatePlayerGroups;
+module.exports =  generatePlayerGroups  , teamA, teamB

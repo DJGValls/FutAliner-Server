@@ -70,6 +70,21 @@ router.get("/user", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// GET "/user/:userId/user"
+router.get("/:userId/user", isAuthenticated, async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const foundUser = await User.findById(userId).populate({
+      path: "players",
+      populate: "team",
+    });
+    // console.log(req.payload);
+    res.status(200).json(foundUser);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // PATCH "/user/edit-names"
 router.patch("/edit-names", isAuthenticated, async (req, res, next) => {
   const { firstName, lastName, nickName } = req.body;
