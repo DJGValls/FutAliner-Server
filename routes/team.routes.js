@@ -528,7 +528,7 @@ function generateTeams(allPlayers) {
   console.log("team B players " + teamB.length);
   const teams = [teamA, teamB]
   console.log(teams);
-  res.status(201).json(teams)
+  res.status(201).json(teams, teamAScore, teamBScore)
   
 
   
