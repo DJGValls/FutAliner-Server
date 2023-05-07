@@ -4,6 +4,7 @@ const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 const Team = require("../models/Team.model");
+// const { Promise } = require("mongoose");
 // const generatePlayerGroups = require("../source/teams/PlayerGroups");
 // const {teamA, teamB} = require("../source/teams/PlayerGroups")
 
@@ -277,263 +278,297 @@ router.delete("/:playerId/delete", isAuthenticated, async (req, res, next) => {
 });
 
 // POST "api/team/selected-players"
-router.patch("/selected-players", isAuthenticated, async (req, res, next) => {
+router.post("/selected-players", isAuthenticated, async (req, res, next) => {
   // console.log(req.body.selectedPlayersList);
 
   try {
-    const allPlayers = await Promise.all(req.body.selectedPlayersList.map(async (eachPlayer) => 
-      await Player.findById(eachPlayer).exec()
-    ))
+    const allPlayers = await Promise.all(
+      req.body.selectedPlayersList.map(
+        async (eachPlayer) => await Player.findById(eachPlayer).exec()
+      )
+    );
 
     // const groups = generatePlayerGroups(allPlayers);
-  
+
     // return res.status(201).json(groups);
 
     const goalkeeperList = [];
-let goalkeeperCounter = 0;
-const teamA = [];
-const teamB = [];
-let teamAScore = 0;
-let teamBScore = 0;
+    let goalkeeperCounter = 0;
+    const teamA = [];
+    const teamB = [];
 
-generatePlayerGroups(allPlayers)
+    // const teams = [];
+    let teamAScore = 0;
+    let teamBScore = 0;
 
-function generatePlayerGroups(allPlayers) {
-  playersScoreLevel(allPlayers);
-  calculatePosition(allPlayers);
-  goalkeeperCounterFunction(allPlayers);
-  filterGoalKeepers(allPlayers);
-  generateTeams(allPlayers);
-}
+    generatePlayerGroups(allPlayers);
 
-function playersScoreLevel(allPlayers) {
-  allPlayers.forEach((eachPlayer) => {
-    allPlayers.push({
-      _id: eachPlayer._id,
-      goalkeeperLevel: eachPlayer.portero,
-      defenseLevel: (eachPlayer.defensa + eachPlayer.cardio) / 2,
-      midfieldLevel: (eachPlayer.tecnica + eachPlayer.cardio) / 2,
-      atackLevel: (eachPlayer.ataque + eachPlayer.cardio) / 2,
-      totalplayerLevel:
-        (eachPlayer.defensa +
-          eachPlayer.ataque +
-          eachPlayer.tecnica +
-          eachPlayer.ataque) /
-        4,
-    });
-  });
-
-  allPlayers.splice(0, allPlayers.length / 2);
-  return allPlayers;
-}
-
-function calculatePosition(allPlayers) {
-  allPlayers.forEach((eachPlayer) => {
-    if (
-      eachPlayer.goalkeeperLevel > eachPlayer.defenseLevel &&
-      eachPlayer.goalkeeperLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.goalkeeperLevel > eachPlayer.atackLevel
-    ) {
-      const positionG = {
-        position: "goalkeeper",
-      };
-      eachPlayer.totalplayerLevel = eachPlayer.goalkeeperLevel;
-      return Object.assign(eachPlayer, positionG);
-    }
-
-    if (
-      eachPlayer.defenseLevel > eachPlayer.goalkeeperLevel &&
-      eachPlayer.defenseLevel > eachPlayer.midfieldLevel &&
-      eachPlayer.defenseLevel >= eachPlayer.atackLevel
-    ) {
-      const positionD = {
-        position: "defense",
-      };
-      eachPlayer.totalplayerLevel = eachPlayer.defenseLevel;
-      return Object.assign(eachPlayer, positionD);
-    }
-
-    if (
-      eachPlayer.midfieldLevel >= eachPlayer.goalkeeperLevel &&
-      eachPlayer.midfieldLevel >= eachPlayer.defenseLevel &&
-      eachPlayer.midfieldLevel >= eachPlayer.atackLevel
-    ) {
-      const positionM = {
-        position: "midfield",
-      };
-      eachPlayer.totalplayerLevel = eachPlayer.midfieldLevel;
-      return Object.assign(eachPlayer, positionM);
-    }
-
-    if (
-      eachPlayer.atackLevel > eachPlayer.goalkeeperLevel &&
-      eachPlayer.atackLevel > eachPlayer.defenseLevel &&
-      eachPlayer.atackLevel > eachPlayer.midfieldLevel
-    ) {
-      const positionA = {
-        position: "forward",
-      };
-      eachPlayer.totalplayerLevel = eachPlayer.atackLevel;
-      return Object.assign(eachPlayer, positionA);
-    }
-  });
-}
-function goalkeeperCounterFunction(allPlayers) {
-  allPlayers.forEach((eachPlayer) => {
-    if (eachPlayer.position === "goalkeeper") {
-      goalkeeperCounter++;
-    }
-  });
-  console.log("goalkeeperCounter " + goalkeeperCounter);
-}
-
-function filterGoalKeepers(allPlayers) {
-  // const goalkeeperCounter = 0;
-  // console.log(allPlayers);
-  // allPlayers.forEach((eachPlayer) => {
-  //   if (eachPlayer.position === "goalkeeper") {
-  //     return goalkeeperCounter = goalkeeperCounter +1 ;
-  //   }
-  // });
-
-  allPlayers.sort(function (a, b) {
-    if (a.goalkeeperLevel > b.goalkeeperLevel) {
-      return 1;
-    }
-    if (a.goalkeeperLevel < b.goalkeeperLevel) {
-      return -1;
-    }
-    // a must be equal to b
-    return 0;
-  });
-
-  if (goalkeeperCounter > 0) {
-    if (goalkeeperList.length < goalkeeperCounter) {
-      goalkeeperList.push(allPlayers.pop());
+    function generatePlayerGroups(allPlayers) {
+      playersScoreLevel(allPlayers);
+      calculatePosition(allPlayers);
+      goalkeeperCounterFunction(allPlayers);
       filterGoalKeepers(allPlayers);
-    } else {
-      // console.log(allPlayers);
+      generateTeams(allPlayers);
+      filteredPlayers(teamA, teamB);
+    }
 
+    function playersScoreLevel(allPlayers) {
+      allPlayers.forEach((eachPlayer) => {
+        allPlayers.push({
+          _id: eachPlayer._id,
+          goalkeeperLevel: eachPlayer.portero,
+          defenseLevel: (eachPlayer.defensa + eachPlayer.cardio) / 2,
+          midfieldLevel: (eachPlayer.tecnica + eachPlayer.cardio) / 2,
+          atackLevel: (eachPlayer.ataque + eachPlayer.cardio) / 2,
+          totalplayerLevel:
+            (eachPlayer.defensa +
+              eachPlayer.ataque +
+              eachPlayer.tecnica +
+              eachPlayer.ataque) /
+            4,
+        });
+      });
+
+      allPlayers.splice(0, allPlayers.length / 2);
       return allPlayers;
     }
-  } else {
-    return allPlayers;
-  }
-}
 
-function generateTeams(allPlayers) {
-  // ordenamos goalkeeperlist como ultimo elemento el mejor portero y los distribuimos a los equipos
-  goalkeeperList.sort(function (a, b) {
-    if (a.totalplayerLevel > b.totalplayerLevel) {
-      return 1;
+    function calculatePosition(allPlayers) {
+      allPlayers.forEach((eachPlayer) => {
+        if (
+          eachPlayer.goalkeeperLevel > eachPlayer.defenseLevel &&
+          eachPlayer.goalkeeperLevel > eachPlayer.midfieldLevel &&
+          eachPlayer.goalkeeperLevel > eachPlayer.atackLevel
+        ) {
+          const positionG = {
+            position: "goalkeeper",
+          };
+          eachPlayer.totalplayerLevel = eachPlayer.goalkeeperLevel;
+          return Object.assign(eachPlayer, positionG);
+        }
+
+        if (
+          eachPlayer.defenseLevel > eachPlayer.goalkeeperLevel &&
+          eachPlayer.defenseLevel > eachPlayer.midfieldLevel &&
+          eachPlayer.defenseLevel >= eachPlayer.atackLevel
+        ) {
+          const positionD = {
+            position: "defense",
+          };
+          eachPlayer.totalplayerLevel = eachPlayer.defenseLevel;
+          return Object.assign(eachPlayer, positionD);
+        }
+
+        if (
+          eachPlayer.midfieldLevel >= eachPlayer.goalkeeperLevel &&
+          eachPlayer.midfieldLevel >= eachPlayer.defenseLevel &&
+          eachPlayer.midfieldLevel >= eachPlayer.atackLevel
+        ) {
+          const positionM = {
+            position: "midfield",
+          };
+          eachPlayer.totalplayerLevel = eachPlayer.midfieldLevel;
+          return Object.assign(eachPlayer, positionM);
+        }
+
+        if (
+          eachPlayer.atackLevel > eachPlayer.goalkeeperLevel &&
+          eachPlayer.atackLevel > eachPlayer.defenseLevel &&
+          eachPlayer.atackLevel > eachPlayer.midfieldLevel
+        ) {
+          const positionA = {
+            position: "forward",
+          };
+          eachPlayer.totalplayerLevel = eachPlayer.atackLevel;
+          return Object.assign(eachPlayer, positionA);
+        }
+      });
     }
-    if (a.totalplayerLevel < b.totalplayerLevel) {
-      return -1;
+    function goalkeeperCounterFunction(allPlayers) {
+      allPlayers.forEach((eachPlayer) => {
+        if (eachPlayer.position === "goalkeeper") {
+          goalkeeperCounter++;
+        }
+      });
+      console.log("goalkeeperCounter " + goalkeeperCounter);
     }
-    // a must be equal to b
-    return 0;
-  });
 
-  if (goalkeeperList.length > 1) {
-    teamA.push(goalkeeperList.pop());
-    teamB.push(goalkeeperList.pop());
-  }
-  if (goalkeeperList.length == 1) {
-    teamA.push(goalkeeperList.pop());
-  }
-  // console.log(goalkeeperList.length);
+    function filterGoalKeepers(allPlayers) {
+      // const goalkeeperCounter = 0;
+      // console.log(allPlayers);
+      // allPlayers.forEach((eachPlayer) => {
+      //   if (eachPlayer.position === "goalkeeper") {
+      //     return goalkeeperCounter = goalkeeperCounter +1 ;
+      //   }
+      // });
 
-  // ordenamos allplayers como ultimo elemento el mejor atacante
-  allPlayers.sort(function (a, b) {
-    if (a.atackLevel > b.atackLevel) {
-      return 1;
+      allPlayers.sort(function (a, b) {
+        if (a.goalkeeperLevel > b.goalkeeperLevel) {
+          return 1;
+        }
+        if (a.goalkeeperLevel < b.goalkeeperLevel) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+
+      if (goalkeeperCounter > 0) {
+        if (goalkeeperList.length < goalkeeperCounter) {
+          goalkeeperList.push(allPlayers.pop());
+          filterGoalKeepers(allPlayers);
+        } else {
+          // console.log(allPlayers);
+
+          return allPlayers;
+        }
+      } else {
+        return allPlayers;
+      }
     }
-    if (a.atackLevel < b.atackLevel) {
-      return -1;
-    }
-    // a must be equal to b
-    return 0;
-  });
-  // console.log(teamA[0].totalplayerLevel);
-  // console.log(teamB[0].totalplayerLevel);
 
-  // extrae el mejor atacante de allplayers a teamB
-  if (teamA.length > 0 && teamB.length > 0) {
-    if (teamA[0].totalplayerLevel > teamB[0].totalplayerLevel) {
-      teamB.push(allPlayers.pop());
-      teamA.push(allPlayers.pop());
-    } else {
-      teamA.push(allPlayers.pop());
-      teamB.push(allPlayers.pop());
-    }
-  }
+    function generateTeams(allPlayers) {
+      // ordenamos goalkeeperlist como ultimo elemento el mejor portero y los distribuimos a los equipos
+      goalkeeperList.sort(function (a, b) {
+        if (a.totalplayerLevel > b.totalplayerLevel) {
+          return 1;
+        }
+        if (a.totalplayerLevel < b.totalplayerLevel) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
 
-  if (teamA.length > 0 && teamB.length == 0) {
-    teamB.push(allPlayers.pop());
-  }
+      if (goalkeeperList.length > 1) {
+        teamA.push(goalkeeperList.pop());
+        teamB.push(goalkeeperList.pop());
+      }
+      if (goalkeeperList.length == 1) {
+        teamA.push(goalkeeperList.pop());
+      }
+      // console.log(goalkeeperList.length);
 
-  // ordenamos allplayers como último elemento el mejor jugador totalplayerlevel
-  allPlayers.sort(function (a, b) {
-    if (a.totalplayerLevel > b.totalplayerLevel) {
-      return 1;
-    }
-    if (a.totalplayerLevel < b.totalplayerLevel) {
-      return -1;
-    }
-    // a must be equal to b
-    return 0;
-  });
-  dividePlayers();
+      // ordenamos allplayers como ultimo elemento el mejor atacante
+      allPlayers.sort(function (a, b) {
+        if (a.atackLevel > b.atackLevel) {
+          return 1;
+        }
+        if (a.atackLevel < b.atackLevel) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      // console.log(teamA[0].totalplayerLevel);
+      // console.log(teamB[0].totalplayerLevel);
 
-  // extraemos el mejor totlaplayerlevel al peor de los dos equipos
-  function dividePlayers() {
-    // Guarda la puntuación total del equipo A
-    teamA.forEach((eachPlayer) => {
-      teamAScore = teamAScore + eachPlayer.totalplayerLevel;
-    });
+      // extrae el mejor atacante de allplayers a teamB
+      if (teamA.length > 0 && teamB.length > 0) {
+        if (teamA[0].totalplayerLevel > teamB[0].totalplayerLevel) {
+          teamB.push(allPlayers.pop());
+          teamA.push(allPlayers.pop());
+        } else {
+          teamA.push(allPlayers.pop());
+          teamB.push(allPlayers.pop());
+        }
+      }
 
-    // Guarda la puntuación total del equipo B
-    teamB.forEach((eachPlayer) => {
-      teamBScore = teamBScore + eachPlayer.totalplayerLevel;
-    });
-
-    if (teamAScore > teamBScore) {
-      if (allPlayers.length > 0) {
+      if (teamA.length > 0 && teamB.length == 0) {
         teamB.push(allPlayers.pop());
-      } else {
-        return
       }
-      if (allPlayers.length > 0) {
-        teamA.push(allPlayers.pop());
-      } else {
-        return
+
+      // ordenamos allplayers como último elemento el mejor jugador totalplayerlevel
+      allPlayers.sort(function (a, b) {
+        if (a.totalplayerLevel > b.totalplayerLevel) {
+          return 1;
+        }
+        if (a.totalplayerLevel < b.totalplayerLevel) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+      dividePlayers();
+
+      // extraemos el mejor totlaplayerlevel al peor de los dos equipos
+      function dividePlayers() {
+        // Guarda la puntuación total del equipo A
+        teamA.forEach((eachPlayer) => {
+          teamAScore = teamAScore + eachPlayer.totalplayerLevel;
+        });
+
+        // Guarda la puntuación total del equipo B
+        teamB.forEach((eachPlayer) => {
+          teamBScore = teamBScore + eachPlayer.totalplayerLevel;
+        });
+
+        if (teamAScore > teamBScore) {
+          if (allPlayers.length > 0) {
+            teamB.push(allPlayers.pop());
+          } else {
+            return;
+          }
+          if (allPlayers.length > 0) {
+            teamA.push(allPlayers.pop());
+          } else {
+            return;
+          }
+        } else {
+          if (allPlayers.length > 0) {
+            teamA.push(allPlayers.pop());
+          } else {
+            return;
+          }
+          if (allPlayers.length > 0) {
+            teamB.push(allPlayers.pop());
+          } else {
+            return;
+          }
+        }
+        dividePlayers();
       }
-    } else {
-      if (allPlayers.length > 0) {
-        teamA.push(allPlayers.pop());
-      } else {
-        return
-      }
-      if (allPlayers.length > 0) {
-        teamB.push(allPlayers.pop());
-      } else {
-        return
-      }
+
     }
-    dividePlayers();
-  }
-  console.log("team A Score " + teamAScore);
-  console.log("team B Score " + teamBScore);
-  console.log("team A players " + teamA.length);
-  console.log("team B players " + teamB.length);
-  const teams = [teamA, teamB]
-  console.log(teams);
-  res.status(201).json(teams, teamAScore, teamBScore)
-  
 
-  
-}
+    async function filteredPlayers(teamA, teamB) {
+      
+      const generatedTeamA = await Promise.all(
+        teamA.map(async (eachPlayer) => {
+          try {
+            const foundPlayer = await Player.findById(eachPlayer._id);
+            const foundUserPlayer = await User.findById(foundPlayer.user);
+            return foundUserPlayer;
+          } catch (error) {
+            next(error);
+          }
+        })
+      );
 
+      const generatedTeamB = await Promise.all(
+        teamB.map(async (eachPlayer) => {
+          try {
+            const foundPlayer = await Player.findById(eachPlayer._id);
+            const foundUserPlayer = await User.findById(foundPlayer.user);
+            return foundUserPlayer;
+          } catch (error) {
+            next(error);
+          }
+        })
+      );
+
+      const teams = [generatedTeamA, generatedTeamB, teamAScore, teamBScore];
+      
+      // const teams = [teamA, teamB];
+
+      res.status(201).json(teams);
+
+      console.log(teams);
+      console.log("team A Score " + teamAScore);
+      console.log("team B Score " + teamBScore);
+      console.log("team A players " + teamA.length);
+      console.log("team B players " + teamB.length);
+    }
   } catch (error) {
     next(error);
   }
