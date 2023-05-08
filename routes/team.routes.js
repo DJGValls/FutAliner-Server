@@ -4,9 +4,6 @@ const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 const Team = require("../models/Team.model");
-// const { Promise } = require("mongoose");
-// const generatePlayerGroups = require("../source/teams/PlayerGroups");
-// const {teamA, teamB} = require("../source/teams/PlayerGroups")
 
 // POST "/api/team/create-team"
 router.post("/create-team", isAuthenticated, async (req, res, next) => {
