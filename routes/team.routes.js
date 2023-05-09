@@ -554,7 +554,7 @@ router.post("/selected-players", isAuthenticated, async (req, res, next) => {
         })
       );
 
-      const teams = [generatedTeamA, generatedTeamB, teamAScore, teamBScore];
+      const teams = [generatedTeamA, generatedTeamB, teamAScore.toFixed(2), teamBScore.toFixed(2)];
       
       // const teams = [teamA, teamB];
 

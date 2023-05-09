@@ -4,6 +4,7 @@ const { isAuthenticated } = require("../middlewares/auth.middlewares");
 const User = require("../models/User.model");
 const Player = require("../models/Player.model");
 const Team = require("../models/Team.model");
+const Votes = require("../models/Votes.model");
 
 // PATCH "/api/player/:playerId/votes"
 router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
@@ -22,7 +23,13 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
   }
 
   // fields are > 10
-  if (portero > 10 || defensa > 10 || tecnica > 10 || ataque > 10 || cardio > 10) {
+  if (
+    portero > 10 ||
+    defensa > 10 ||
+    tecnica > 10 ||
+    ataque > 10 ||
+    cardio > 10
+  ) {
     return res
       .status(400)
       .json({ errorMessage: "Ningún campo ha de superar 10 puntos" });
@@ -37,10 +44,21 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
 
   try {
     const foundPlayer = await Player.findById(playerId);
-    const lastUpdatedDate = foundPlayer.updatedAt;
-    const lastUpdatedYear = lastUpdatedDate.getFullYear();
-    const lastUpdatedMonth = lastUpdatedDate.getMonth();
-    const lastUpdatedDay = lastUpdatedDate.getDate();
+    // const foundPlayerVoted = await Votes.find({
+    //   $or: [
+    //     {
+    //       userId: req.payload._id
+    //     },
+    //     {
+    //       playerId: foundPlayer._id
+    //     }
+    //   ]
+    // })
+    // const lastUpdatedDate = foundPlayer.updatedAt;
+    // const lastUpdatedYear = lastUpdatedDate.getFullYear();
+    // const lastUpdatedMonth = lastUpdatedDate.getMonth();
+    // const lastUpdatedDay = lastUpdatedDate.getDate();
+    //  console.log(foundPlayerVoted);
 
     //  no votes for your own player profiles
     if (foundPlayer.user == req.payload._id) {
@@ -59,29 +77,37 @@ router.patch("/:playerId/votes", isAuthenticated, async (req, res, next) => {
         cardio,
         votes: foundPlayer.votes + 1,
       });
+      // await Votes.create({
+      //   userId: req.payload._id,
+      //   playerId: foundPlayer._id,
+      // })
     } else {
       // 1 vote per day
       // console.log(lastUpdatedDate);
       // console.log(date);
       // console.log(currentYear, lastUpdatedYear);
-      if (
-        currentYear === lastUpdatedYear &&
-        currentMonth === lastUpdatedMonth &&
-        currentDay === lastUpdatedDay
-      ) {
-        return res
-          .status(400)
-          .json({ errorMessage: "Solo puedes votar una vez al dia" });
-      } else {
-        await Player.findByIdAndUpdate(playerId, {
-          portero: ((foundPlayer.portero + Number(portero)) / 2).toFixed(1),
-          defensa: ((foundPlayer.defensa + Number(defensa)) / 2).toFixed(1),
-          tecnica: ((foundPlayer.tecnica + Number(tecnica)) / 2).toFixed(1),
-          ataque: ((foundPlayer.ataque + Number(ataque)) / 2).toFixed(1),
-          cardio: ((foundPlayer.cardio + Number(cardio)) / 2).toFixed(1),
-          votes: foundPlayer.votes + 1,
-        });
-      }
+      // console.log(req.payload);
+      // if (
+      //   currentYear === lastUpdatedYear &&
+      //   currentMonth === lastUpdatedMonth &&
+      //   currentDay === lastUpdatedDay
+      // ) {
+      //   return res
+      //     .status(400)
+      //     .json({ errorMessage: "Solo puedes votar una vez al dia" });
+      // } else {
+      await Player.findByIdAndUpdate(playerId, {
+        portero: ((foundPlayer.portero + Number(portero)) / 2).toFixed(1),
+        defensa: ((foundPlayer.defensa + Number(defensa)) / 2).toFixed(1),
+        tecnica: ((foundPlayer.tecnica + Number(tecnica)) / 2).toFixed(1),
+        ataque: ((foundPlayer.ataque + Number(ataque)) / 2).toFixed(1),
+        cardio: ((foundPlayer.cardio + Number(cardio)) / 2).toFixed(1),
+        votes: foundPlayer.votes + 1,
+      });
+      // await Votes.create({
+      //   userId: req.payload._id,
+      //   playerId: foundPlayer._id,
+      // })
     }
   } catch (error) {
     next(error);
